@@ -12,6 +12,10 @@ inputs:
     description: "File to save output result"
     required: false
     default: "nuclei.log"
+  sarif-export:
+    description: "Export output in sarif format"
+    required: false
+    default: false
   include-rr:
     description: "Write requests/responses for matches in JSON output"
     required: false
@@ -26,7 +30,7 @@ inputs:
     description: "Active Nuclei Reporting Module for Github"
     required: false
     default: false
-  report-token:
+  github-token:
     description: "Github token for create issues"
     required: false
     
@@ -41,8 +45,9 @@ runs:
         [ ! -z ${{ inputs.nuclei-ignore }} ] && cp ${{ inputs.nuclei-ignore }} /nuclei-templates/.nuclei-ignore
         [ ! -z "${{ inputs.user-agent }}" ] && echo 'useragent=-H "User-Agent: ${{ inputs.user-agent }}"' >> $GITHUB_ENV
         ${{ inputs.include-rr }} && echo "includerr=-irr" >> $GITHUB_ENV
-        
-        ${{ inputs.github-report }} \
+        ${{ inputs.sarif-export }} && echo "sarif=-sf nuclei.sarif" >> $GITHUB_ENV
+
+        ${{ inputs.github-token }} \
         && touch ~/nuclei-report-config.yaml \
         && echo -e "github:" >> ~/nuclei-report-config.yaml \
         && echo -e "  username: \"$GITHUB_ACTOR\"" >> ~/nuclei-report-config.yaml \
@@ -53,17 +58,17 @@ runs:
         && echo "reportconfig=-rc ~/nuclei-report-config.yaml" >> $GITHUB_ENV
         
         nuclei \
-          -update-templates \
+          -update-templates -silent \
           -update-directory ./nuclei-templates
       shell: bash
     - run: |
         
-        nuclei \
+        nuclei -silent \
           -target ${{ inputs.target }} \
           -t ./nuclei-templates/${{ inputs.templates }} \
           ${{ env.useragent }} \
           -o ${{ inputs.output }} \
-          -json \
           ${{ env.reportconfig }} \
+          ${{ env.sarif }} \
           ${{ env.includerr }}
       shell: bash
