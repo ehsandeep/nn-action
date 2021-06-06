@@ -5,6 +5,9 @@ inputs:
   target:
     description: "Target to run nuclei scan"
     required: true
+  urls:
+    description: "Target ULRs to run nuclei scan"
+    required: false
   templates:
     description: "Templates input file/files to check across hosts"
     required: false
@@ -61,6 +64,7 @@ runs:
     - run: |
         nuclei -silent \
           -target ${{ inputs.target }} \
+          -list ${{ inputs.urls }} \
           -t ./nuclei-templates/${{ inputs.templates }} \
           ${{ env.useragent }} \
           -o ${{ inputs.output }} \
