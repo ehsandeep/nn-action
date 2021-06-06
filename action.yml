@@ -15,7 +15,7 @@ inputs:
   sarif-export:
     description: "Export output in sarif format"
     required: false
-    default: false
+    default: "nuclei.sarif"
   include-rr:
     description: "Write requests/responses for matches in JSON output"
     required: false
@@ -45,7 +45,6 @@ runs:
         [ ! -z ${{ inputs.nuclei-ignore }} ] && cp ${{ inputs.nuclei-ignore }} /nuclei-templates/.nuclei-ignore
         [ ! -z "${{ inputs.user-agent }}" ] && echo 'useragent=-H "User-Agent: ${{ inputs.user-agent }}"' >> $GITHUB_ENV
         ${{ inputs.include-rr }} && echo "includerr=-irr" >> $GITHUB_ENV
-        ${{ inputs.sarif-export }} && echo "sarif=-sf nuclei.sarif" >> $GITHUB_ENV
 
         ${{ inputs.github-token }} \
         && touch ~/nuclei-report-config.yaml \
@@ -69,6 +68,6 @@ runs:
           ${{ env.useragent }} \
           -o ${{ inputs.output }} \
           ${{ env.reportconfig }} \
-          ${{ env.sarif }} \
+          -sf ${{ inputs.sarif-export }} \
           ${{ env.includerr }}
       shell: bash
