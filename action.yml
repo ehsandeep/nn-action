@@ -4,7 +4,7 @@ description: "Nuclei is a fast and customisable vulnerability scanner based on s
 inputs:
   target:
     description: "Target to run nuclei scan"
-    required: true
+    required: false
   urls:
     description: "Target ULRs to run nuclei scan"
     required: false
