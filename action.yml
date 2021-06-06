@@ -4,10 +4,7 @@ description: "Nuclei is a fast and customisable vulnerability scanner based on s
 inputs:
   target:
     description: "Target to run nuclei scan"
-    required: false
-  urls:
-    description: "Target ULRs to run nuclei scan"
-    required: false
+    required: true
   templates:
     description: "Templates input file/files to check across hosts"
     required: false
@@ -15,6 +12,10 @@ inputs:
     description: "File to save output result"
     required: false
     default: "nuclei.log"
+  sarif-export:
+    description: "Export output in sarif format"
+    required: false
+    default: "nuclei.sarif"
   include-rr:
     description: "Write requests/responses for matches in JSON output"
     required: false
@@ -64,10 +65,8 @@ runs:
     - run: |
         nuclei -silent \
           -target ${{ inputs.target }} \
-          -list ${{ inputs.urls }} \
           -t ./nuclei-templates/${{ inputs.templates }} \
           ${{ env.useragent }} \
           -o ${{ inputs.output }} \
-          ${{ env.reportconfig }} \
           ${{ env.includerr }}
       shell: bash
